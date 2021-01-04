@@ -1,20 +1,30 @@
 ## Scraping TopAchat
 
 ```bash
-python3.8 -m pip install pip
+sudo apt update
 
-pip3.8 install virtualenv
+sudo apt -y upgrade
 
-virtualenv venv
+git clone https://github.com/chichi13/scrapingDisponibilityTopAchat.git
+
+
+# python3-pip ou python3.8-pip selon la version par défaut de python3
+sudo apt install python3-pip
+
+pip3 install virtualenv
+
+sudo apt install python3-venv
+
+python3 -m venv venv
 
 source venv/bin/activate
 
-pip3.8 install -r requirement.txt
+pip3 install -r requirement.txt
 ```
 
 - Remplir products.csv avec des liens TopAchat
 - Exécuter le script
 
 ```bash
-python3.8 get_stock.py
+python3 get_stock.py
 ```
