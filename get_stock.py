@@ -1,7 +1,9 @@
 import time
 from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
 import pandas as pd
 import requests
+import sys
 
 
 HEADERS = {
@@ -13,23 +15,27 @@ urls = []
 products = []
 prices = []
 stocks = []
+notified_urls = {}
+sys.stdout = open("scraping.log", "a")
 
 
-def send_ifttt_notification(first, second, third):
+def send_ifttt_notification(name, price, url, notified_urls):
     ifttt_webhook_url = "https://maker.ifttt.com/trigger/disponibilite_topachat/with/key/c88QyHay9oOR4eBevrdUDP"
     report = {}
-    print("Send notification...")
 
-    report["value1"] = first
-    report["value2"] = second
-    report["value3"] = third
-    requests.post(ifttt_webhook_url, data=report)
+    if url not in notified_urls or notified_urls[url] < datetime.now():
+        print("Send notification...")
+
+        report["value1"] = name
+        report["value2"] = price
+        report["value3"] = url
+        requests.post(ifttt_webhook_url, data=report)
+        notified_urls[url] = datetime.now() + timedelta(hours=3)
 
 
 def search_disponibility():
     prod_tracker = pd.read_csv("trackers/products.csv")
     prod_tracker_urls = prod_tracker.url
-    print("Scraping...")
 
     for url in prod_tracker_urls:
         page = requests.get(url, headers=HEADERS)
@@ -37,6 +43,8 @@ def search_disponibility():
 
         name = soup.find("h1", attrs={"class": "fn"})
         price = soup.find("span", attrs={"class": "priceFinal fp44"})
+
+        print("Scraping " + str(name.text) + "...")
 
         if soup.find("section", attrs={"class": "cart-box en-rupture"}) is not None:
             stock = "En rupture"
@@ -48,7 +56,7 @@ def search_disponibility():
             prices.append(price.text)
             stocks.append(stock)
             urls.append(url)
-            send_ifttt_notification(name.text, price.text, url)
+            send_ifttt_notification(name.text, price.text, url, notified_urls)
 
     df = pd.DataFrame(
         {"Nom du produit": products, "Prix": prices, "Stock": stocks, "URL": urls}
