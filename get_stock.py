@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import pandas as pd
 import requests
-import sys
+import logging
 
 
 HEADERS = {
@@ -16,7 +16,7 @@ products = []
 prices = []
 stocks = []
 notified_urls = {}
-sys.stdout = open("scraping.log", "a")
+logging.basicConfig(filename='scraping.log', filemode='w', format='[%(asctime)s] - [%(levelname)s] - %(message)s')
 
 
 def send_ifttt_notification(name, price, url, notified_urls):
@@ -24,7 +24,7 @@ def send_ifttt_notification(name, price, url, notified_urls):
     report = {}
 
     if url not in notified_urls or notified_urls[url] < datetime.now():
-        print("Send notification...")
+        logging.info("Send notification for %s", name)
 
         report["value1"] = name
         report["value2"] = price
@@ -44,7 +44,7 @@ def search_disponibility():
         name = soup.find("h1", attrs={"class": "fn"})
         price = soup.find("span", attrs={"class": "priceFinal fp44"})
 
-        print("Scraping " + str(name.text) + "...")
+        logging.info("Scraping %s...", str(name.text))
 
         if soup.find("section", attrs={"class": "cart-box en-rupture"}) is not None:
             stock = "En rupture"
@@ -65,5 +65,8 @@ def search_disponibility():
 
 
 while True:
-    search_disponibility()
-    time.sleep(10)
+    try:
+        search_disponibility()
+        time.sleep(10)
+    except Exception as e:
+        logging.error(str(e))
