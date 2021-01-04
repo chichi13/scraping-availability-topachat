@@ -15,4 +15,6 @@ pip3.8 install -r requirement.txt
 - Remplir products.csv avec des liens TopAchat
 - Exécuter le script
 
+```bash
 python3.8 get_stock.py
+```
