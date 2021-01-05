@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import requests
 import logging
-from config import ifttt_webhook_url
+from config.config import ifttt_webhook_url
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) \
