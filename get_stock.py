@@ -19,7 +19,7 @@ stocks = []
 notified_urls = {}
 
 
-def send_ifttt_notification(name, price, url, notified_urls):
+def send_ifttt_notification(name, price, url):
     report = {}
 
     if url not in notified_urls or notified_urls[url] < datetime.now():
@@ -55,17 +55,7 @@ def search_disponibility():
             prices.append(price.text)
             stocks.append(stock)
             urls.append(url)
-            send_ifttt_notification(name.text, price.text, url, notified_urls)
-
-    df = pd.DataFrame(
-        {
-            "Nom du produit": products,
-            "Prix": prices,
-            "Stock": stocks,
-            "URL": urls
-        }
-    )
-    df.to_csv("stock.csv", index=False, encoding="utf-8")
+            send_ifttt_notification(name.text, price.text, url)
 
 
 def main():
