@@ -1,4 +1,4 @@
-## Scraping TopAchat
+## Scraping Disponibilité TopAchat / IFTTT
 
 ```bash
 sudo apt update
@@ -23,6 +23,14 @@ pip3 install -r requirement.txt
 ```
 
 - Remplir products.csv avec des liens TopAchat
+- Remplacer EVENT_NAME et API_KEY dans config/config.py
+
+```bash
+# Dev :
+# Afin de ne pas push la modification config.py et de partager la clé sur Github :
+git update-index --assume-unchanged config/config.py
+```
+
 - Exécuter le script
 
 ```bash
