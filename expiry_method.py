@@ -1,11 +1,37 @@
-Une classe abstraite qui sert à définir 2 méthodes :
-    - Une qui serait de set clé:date_expiration
-    - Une qui serait de récupérer une clé si elle existe
+import redis
+from datetime import datetime
 
-class AbstractStorage():
-    def getKey():
-        raise Exception("Method")
 
-class LocalStorage(AbstractStorage):
-    def getKey(self):
-        return self.blabla
+class LocalStorage():
+    def __init__(self):
+        self.storage = {}
+
+    def __contains__(self, keyName):
+        self.updateKeys(keyName)
+        return keyName in self.storage
+
+    def getKey(self, keyName):
+        self.updateKeys(keyName)
+        return self.storage.get(keyName)
+
+    def setKey(self, keyName, date):
+        self.storage[keyName] = datetime.now() + date
+
+    def updateKeys(self, keyName):
+        if keyName in self.storage and self.storage[keyName] < datetime.now():
+            self.storage.pop(keyName, None)
+
+
+class RedisStorage():
+    def __init__(self):
+        self.r = redis.Redis()
+
+    def __contains__(self, keyName):
+        return self.r.exists(keyName)
+
+    def setKey(self, keyName, time):
+        self.r.setex(
+            keyName,
+            time,
+            value="Temps avant expiration"
+        )

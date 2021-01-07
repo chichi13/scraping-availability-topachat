@@ -5,6 +5,7 @@ import pandas as pd
 import requests
 import logging
 from config.config import ifttt_webhook_url
+from expiry_method import LocalStorage, RedisStorage
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) \
@@ -16,20 +17,21 @@ urls = []
 products = []
 prices = []
 stocks = []
-notified_urls = {}
+redis_connection = True
+storage = None
 
 
 def send_ifttt_notification(name, price, url):
     report = {}
 
-    if url not in notified_urls or notified_urls[url] < datetime.now():
+    if url not in storage:
         logging.info("Send notification for %s", name)
 
         report["value1"] = name
         report["value2"] = price
         report["value3"] = url
         requests.post(ifttt_webhook_url, data=report)
-        notified_urls[url] = datetime.now() + timedelta(hours=3)
+        storage.setKey(url, timedelta(hours=3))
 
 
 def search_disponibility():
@@ -59,12 +61,17 @@ def search_disponibility():
 
 
 def main():
+    global storage
+
     logging.basicConfig(
         filename="scraping.log",
         format="[%(asctime)s] - [%(levelname)s] - %(message)s",
         level=logging.INFO,
     )
     logging.info("Started")
+
+    storage = LocalStorage() if not redis_connection else RedisStorage()
+
     while True:
         try:
             search_disponibility()
