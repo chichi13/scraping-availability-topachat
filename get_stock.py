@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import requests
 import logging
-from config.config import ifttt_webhook_url
+from config.config import ifttt_webhook_url, redis_connection
 from expiry_method import LocalStorage, RedisStorage
 
 HEADERS = {
@@ -17,7 +17,6 @@ urls = []
 products = []
 prices = []
 stocks = []
-redis_connection = True
 storage = None
 
 
