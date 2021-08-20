@@ -2,7 +2,6 @@ import time
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 import pandas as pd
-import requests
 import logging
 from config.config import ifttt_webhook_url, redis_connection
 from expiry_method import LocalStorage, RedisStorage
@@ -19,6 +18,7 @@ prices = []
 stocks = []
 disponibility = ""
 storage = None
+scraper = cloudscraper.create_scraper()
 
 
 def send_ifttt_notification(name, price, url):
@@ -30,7 +30,7 @@ def send_ifttt_notification(name, price, url):
         report["value1"] = name
         report["value2"] = price
         report["value3"] = url
-        requests.post(ifttt_webhook_url, data=report)
+        scraper.post(ifttt_webhook_url, data=report)
         storage.setKey(url, timedelta(hours=3))
 
 
@@ -39,7 +39,7 @@ def search_disponibility():
     prod_tracker_urls = prod_tracker.url
 
     for url in prod_tracker_urls:
-        page = requests.get(url, headers=HEADERS)
+        page = scraper.get(url)
         soup = BeautifulSoup(page.content, features="lxml")
         if url.startswith("https://www.topachat.com"):
             name = soup.find("h1", attrs={"class": "fn"})
