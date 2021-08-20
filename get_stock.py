@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import requests
 import logging
-from config.config import ifttt_webhook_url
+from config.config import ifttt_webhook_url, redis_connection
 from expiry_method import LocalStorage, RedisStorage
 
 HEADERS = {
@@ -17,7 +17,7 @@ urls = []
 products = []
 prices = []
 stocks = []
-redis_connection = True
+disponibility = ""
 storage = None
 
 
@@ -41,18 +41,23 @@ def search_disponibility():
     for url in prod_tracker_urls:
         page = requests.get(url, headers=HEADERS)
         soup = BeautifulSoup(page.content, features="lxml")
+        if url.startswith("https://www.topachat.com"):
+            name = soup.find("h1", attrs={"class": "fn"})
+            price = soup.find("span", attrs={"class": "priceFinal fp44"})
+            logging.info("Scraping TopAchat %s...", str(name.text))
+            disponibility = soup.find("section", attrs={"class": "cart-box en-rupture"})
+        elif url.startswith("https://www.pccomponentes.com"):
+            name = soup.find("h1", attrs={"class": "h4"})
+            price = soup.find("span", attrs={"class": "baseprice"})
+            logging.info("Scraping PCComponentes %s...", str(name.text))
+            disponibility = soup.find("button", attrs={"class": "notify-me"})
+        else:
+            continue
 
-        name = soup.find("h1", attrs={"class": "fn"})
-        price = soup.find("span", attrs={"class": "priceFinal fp44"})
-
-        logging.info("Scraping %s...", str(name.text))
-
-        if soup.find("section", attrs={"class": "cart-box en-rupture"}) is not None:
+        if disponibility is not None:
             stock = "En rupture"
         else:
             stock = "Disponible"
-
-        if stock == "Disponible":
             products.append(name.text)
             prices.append(price.text)
             stocks.append(stock)
