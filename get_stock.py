@@ -18,11 +18,9 @@ urls = []
 products = []
 prices = []
 stocks = []
-disponibility = ""
-storage = None
 
 
-def send_ifttt_notification(name, price, url):
+def send_ifttt_notification(name, price, url, storage):
     report = {}
 
     if url not in storage:
@@ -35,7 +33,8 @@ def send_ifttt_notification(name, price, url):
         storage.setKey(url, timedelta(hours=3))
 
 
-def search_disponibility():
+def search_disponibility(storage):
+    disponibility = ""
     prod_tracker = pd.read_csv("trackers/products.csv")
     prod_tracker_urls = prod_tracker.url
 
@@ -58,12 +57,10 @@ def search_disponibility():
             prices.append(price.text)
             stocks.append(stock)
             urls.append(url)
-            send_ifttt_notification(name.text, price.text, url)
+            send_ifttt_notification(name.text, price.text, url, storage)
 
 
 def main():
-    global storage
-
     logging.basicConfig(
         format="[%(asctime)s] - [%(levelname)s] - %(message)s",
         level=logging.INFO,
@@ -74,7 +71,7 @@ def main():
 
     while True:
         try:
-            search_disponibility()
+            search_disponibility(storage)
             time.sleep(10)
         except Exception as e:
             logging.error(str(e))
