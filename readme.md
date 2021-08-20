@@ -23,14 +23,14 @@ pip3 install -r requirement.txt
 ```
 
 - Remplir products.csv avec des liens TopAchat
-- Remplacer EVENT_NAME et API_KEY dans config/config.py
+- Avoir un fichier `.env` dans `config/` :
 
-```bash
-# Dev :
-# Afin de ne pas push la modification config.py et de partager la clé sur Github :
-git update-index --assume-unchanged config/config.py
+```
+IFTTT_WEBHOOK_URL=https://maker.ifttt.com/trigger/{EVENT}/with/key/{API_KEY}
+REDIS_CONNECTION=False
 ```
 
+- Remplacer `EVENT_NAME` et `API_KEY` dans `config/.env` (`API_KEY` trouvable https://ifttt.com/maker_webhooks/settings)
 - Exécuter le script
 
 ```bash

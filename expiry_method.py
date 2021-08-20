@@ -1,4 +1,5 @@
 import redis
+from config import Config
 from datetime import datetime
 
 
@@ -24,7 +25,9 @@ class LocalStorage:
 
 class RedisStorage:
     def __init__(self):
-        self.r = redis.Redis()
+        self.r = redis.Redis(
+            host=Config.REDIS_URL, socket_connect_timeout=Config.REDIS_SOCKET_TIMEOUT
+        )
 
     def __contains__(self, keyName):
         return self.r.exists(keyName)
