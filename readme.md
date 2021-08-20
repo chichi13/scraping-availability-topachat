@@ -18,12 +18,12 @@ REDIS_SOCKET_TIMEOUT=5 # default
 ```bash
 docker network create scraping
 docker volume create scraping-redis
-docker run --name some-redis -v scraping-redis:/data --network scraping -d redis
+docker run --name scraping-redis -v scraping-redis:/data --network scraping -d redis
 ```
 
-- On va ensuite build notre app puis l'exécuter (dev ou prod) :
+- On va ensuite build notre app puis l'exécuter :
 
 ```bash
-docker build . -t scraping:prod -f docker/dockerfile.
+docker build . -t scraping:prod -f docker/dockerfile
 docker run --name scraping-prod --network scraping --env-file config/.env -it scraping:prod
 ```
