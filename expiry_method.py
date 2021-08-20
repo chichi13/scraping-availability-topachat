@@ -2,7 +2,7 @@ import redis
 from datetime import datetime
 
 
-class LocalStorage():
+class LocalStorage:
     def __init__(self):
         self.storage = {}
 
@@ -22,7 +22,7 @@ class LocalStorage():
             self.storage.pop(keyName, None)
 
 
-class RedisStorage():
+class RedisStorage:
     def __init__(self):
         self.r = redis.Redis()
 
@@ -30,8 +30,4 @@ class RedisStorage():
         return self.r.exists(keyName)
 
     def setKey(self, keyName, time):
-        self.r.setex(
-            keyName,
-            time,
-            value="Temps avant expiration"
-        )
+        self.r.setex(keyName, time, value="Temps avant expiration")

@@ -1,9 +1,10 @@
 import time
-from datetime import datetime, timedelta
+from datetime import timedelta
 from bs4 import BeautifulSoup
 import pandas as pd
 import logging
-from config.config import ifttt_webhook_url, redis_connection
+import requests
+from config import Config
 from expiry_method import LocalStorage, RedisStorage
 
 HEADERS = {
@@ -18,7 +19,6 @@ prices = []
 stocks = []
 disponibility = ""
 storage = None
-scraper = cloudscraper.create_scraper()
 
 
 def send_ifttt_notification(name, price, url):
@@ -30,7 +30,7 @@ def send_ifttt_notification(name, price, url):
         report["value1"] = name
         report["value2"] = price
         report["value3"] = url
-        scraper.post(ifttt_webhook_url, data=report)
+        requests.post(Config.IFTTT_WEBHOOK_URL, data=report)
         storage.setKey(url, timedelta(hours=3))
 
 
@@ -39,18 +39,13 @@ def search_disponibility():
     prod_tracker_urls = prod_tracker.url
 
     for url in prod_tracker_urls:
-        page = scraper.get(url)
+        page = requests.get(url)
         soup = BeautifulSoup(page.content, features="lxml")
         if url.startswith("https://www.topachat.com"):
             name = soup.find("h1", attrs={"class": "fn"})
             price = soup.find("span", attrs={"class": "priceFinal fp44"})
             logging.info("Scraping TopAchat %s...", str(name.text))
             disponibility = soup.find("section", attrs={"class": "cart-box en-rupture"})
-        elif url.startswith("https://www.pccomponentes.com"):
-            name = soup.find("h1", attrs={"class": "h4"})
-            price = soup.find("span", attrs={"class": "baseprice"})
-            logging.info("Scraping PCComponentes %s...", str(name.text))
-            disponibility = soup.find("button", attrs={"class": "notify-me"})
         else:
             continue
 
@@ -69,13 +64,12 @@ def main():
     global storage
 
     logging.basicConfig(
-        filename="scraping.log",
         format="[%(asctime)s] - [%(levelname)s] - %(message)s",
         level=logging.INFO,
     )
     logging.info("Started")
 
-    storage = LocalStorage() if not redis_connection else RedisStorage()
+    storage = LocalStorage() if not Config.REDIS_CONNECTION else RedisStorage()
 
     while True:
         try:
