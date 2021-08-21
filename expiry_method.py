@@ -1,6 +1,8 @@
-import redis
-from config import Config
 from datetime import datetime
+
+import redis
+
+from config import Config
 
 
 class LocalStorage:

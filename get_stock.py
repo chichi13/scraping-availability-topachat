@@ -1,10 +1,11 @@
-import time
 import logging
-import requests
-import pandas as pd
-
+import time
 from datetime import timedelta
+
+import pandas as pd
+import requests
 from bs4 import BeautifulSoup
+
 from config import Config
 from expiry_method import LocalStorage, RedisStorage
 
