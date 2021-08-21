@@ -9,20 +9,20 @@ class LocalStorage:
     def __init__(self):
         self.storage = {}
 
-    def __contains__(self, keyName):
-        self.updateKeys(keyName)
-        return keyName in self.storage
+    def __contains__(self, key_name):
+        self.update_keys(key_name)
+        return key_name in self.storage
 
-    def getKey(self, keyName):
-        self.updateKeys(keyName)
-        return self.storage.get(keyName)
+    def get_key(self, key_name):
+        self.update_keys(key_name)
+        return self.storage.get(key_name)
 
-    def setKey(self, keyName, date):
-        self.storage[keyName] = datetime.now() + date
+    def set_key(self, key_name, date):
+        self.storage[key_name] = datetime.now() + date
 
-    def updateKeys(self, keyName):
-        if keyName in self.storage and self.storage[keyName] < datetime.now():
-            self.storage.pop(keyName, None)
+    def update_keys(self, key_name):
+        if key_name in self.storage and self.storage[key_name] < datetime.now():
+            self.storage.pop(key_name, None)
 
 
 class RedisStorage:
@@ -31,8 +31,8 @@ class RedisStorage:
             host=Config.REDIS_URL, socket_connect_timeout=Config.REDIS_SOCKET_TIMEOUT
         )
 
-    def __contains__(self, keyName):
-        return self.r.exists(keyName)
+    def __contains__(self, key_name):
+        return self.r.exists(key_name)
 
-    def setKey(self, keyName, time):
-        self.r.setex(keyName, time, value="Temps avant expiration")
+    def set_key(self, key_name, time):
+        self.r.setex(key_name, time, value="Temps avant expiration")

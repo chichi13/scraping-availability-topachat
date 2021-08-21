@@ -31,7 +31,7 @@ def send_ifttt_notification(name, price, url, storage):
         report["value2"] = price
         report["value3"] = url
         requests.post(Config.IFTTT_WEBHOOK_URL, data=report)
-        storage.setKey(url, timedelta(hours=3))
+        storage.set_key(url, timedelta(hours=3))
 
 
 def search_disponibility(storage):
