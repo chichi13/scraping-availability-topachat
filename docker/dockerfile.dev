@@ -1,7 +1,7 @@
-FROM python:3.9-slim-buster
+FROM python:3.10.4-slim-buster
 LABEL maintainer="chichi13"
 
-# Keeping the image up to date and installing node 15
+# Keeping the image up to date
 RUN apt-get update -y && apt-get upgrade -y && \
     rm -rf /var/lib/apt/lists/*
 
@@ -14,4 +14,4 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements/dev.
 
 COPY . /app
 
-CMD [ "python3", "get_stock.py"]
+CMD [ "python3", "main.py"]

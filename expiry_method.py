@@ -2,7 +2,7 @@ from datetime import datetime
 
 import redis
 
-from config import Config
+from config import settings
 
 
 class LocalStorage:
@@ -28,7 +28,8 @@ class LocalStorage:
 class RedisStorage:
     def __init__(self):
         self.r = redis.Redis(
-            host=Config.REDIS_URL, socket_connect_timeout=Config.REDIS_SOCKET_TIMEOUT
+            host=settings.REDIS_URL,
+            socket_connect_timeout=settings.REDIS_SOCKET_TIMEOUT,
         )
 
     def __contains__(self, key_name):

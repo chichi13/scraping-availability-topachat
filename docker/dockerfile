@@ -1,4 +1,4 @@
-FROM python:3.9-slim-buster
+FROM python:3.10.4-slim-buster
 LABEL maintainer="chichi13"
 
 # Keeping the image up to date
@@ -18,4 +18,4 @@ RUN pip install --user --no-cache-dir -r requirements/prod.txt
 
 COPY --chown=app:app . /app
 
-CMD [ "python3", "get_stock.py"]
+CMD [ "python3", "main.py"]
