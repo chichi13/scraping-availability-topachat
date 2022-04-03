@@ -2,7 +2,7 @@ from datetime import datetime
 
 import redis
 
-from config import settings
+from resources.config import settings
 
 
 class LocalStorage:
