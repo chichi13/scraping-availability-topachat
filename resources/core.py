@@ -1,8 +1,8 @@
 import logging
 from datetime import timedelta
 
-import pandas as pd
-import requests
+import aiohttp
+import asyncio
 from bs4 import BeautifulSoup
 
 from resources.config import settings
@@ -19,7 +19,7 @@ prices = []
 stocks = []
 
 
-def send_ifttt_notification(name, price, url, storage):
+async def send_ifttt_notification(name, price, url, storage):
     report = {}
 
     if url not in storage:
@@ -28,34 +28,41 @@ def send_ifttt_notification(name, price, url, storage):
         report["value1"] = name
         report["value2"] = price
         report["value3"] = url
-        requests.post(settings.IFTTT_WEBHOOK_URL, data=report)
+        async with aiohttp.ClientSession() as session:
+            await session.post(settings.IFTTT_WEBHOOK_URL, data=report)
         storage.set_key(url, timedelta(hours=3))
 
 
-def search_disponibility(storage):
-    disponibility = ""
-    prod_tracker = pd.read_csv("trackers/products.csv")
-    prod_tracker_urls = prod_tracker.url
+async def fetch_all(url, storage):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            print(f"Request URL {url} : {resp.status}")
+            data = await resp.text()
+            soup = BeautifulSoup(data, features="lxml")
 
-    session = requests.Session()    
+            name = soup.find("h1", attrs={"class": "fn"})
+            price = soup.find("span", attrs={"class": "priceFinal fp44"})
+            logging.info(f"Scraping TopAchat {name.text}...")
+            disponibility = soup.find(
+                "section", attrs={"class": "cart-box en-rupture"}
+            )
 
-    for url in prod_tracker_urls:
-        page = session.get(url)
-        soup = BeautifulSoup(page.content, features="lxml")
+            if disponibility is not None:
+                logging.info(f"{name.text} en rupture de stock.")
+            else:
+                stock = "Disponible"
+                products.append(name.text)
+                prices.append(price.text)
+                stocks.append(stock)
+                urls.append(url)
+                await send_ifttt_notification(name.text, price.text, url, storage)
 
-        name = soup.find("h1", attrs={"class": "fn"})
-        price = soup.find("span", attrs={"class": "priceFinal fp44"})
-        logging.info(f"Scraping TopAchat {name.text}...")
-        disponibility = soup.find(
-            "section", attrs={"class": "cart-box en-rupture"}
-        )
+    return soup
 
-        if disponibility is not None:
-            logging.info(f"{name.text} en rupture de stock.")
-        else:
-            stock = "Disponible"
-            products.append(name.text)
-            prices.append(price.text)
-            stocks.append(stock)
-            urls.append(url)
-            send_ifttt_notification(name.text, price.text, url, storage)
+
+async def fetch(storage):
+    prod_tracker = open("trackers/products.csv")
+    prod_tracker_urls = prod_tracker.read().splitlines()
+
+    await asyncio.gather(*(fetch_all(url, storage) for url in prod_tracker_urls))
+

@@ -1,12 +1,13 @@
+import asyncio
 import logging
 import time
 
 from resources.config import settings
+from resources.core import fetch
 from resources.expiry_method import LocalStorage, RedisStorage
-from resources.core import search_disponibility
 
 
-def main():
+async def main():
     logging.basicConfig(
         format="[%(asctime)s] - [%(levelname)s] - %(message)s",
         level=logging.INFO,
@@ -17,7 +18,7 @@ def main():
 
     while True:
         try:
-            search_disponibility(storage)
+            await fetch(storage)
             logging.info("Waiting...")
             time.sleep(10)
         except Exception as e:
@@ -25,4 +26,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

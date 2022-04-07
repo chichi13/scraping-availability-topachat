@@ -1,6 +1,6 @@
 beautifulsoup4==4.10.0
 pandas==1.4.1
-requests==2.27.1
+aiohttp==3.8.1
 lxml==4.8.0
 redis==4.2.0
 pydantic[dotenv]==1.9.0
