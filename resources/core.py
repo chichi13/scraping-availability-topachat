@@ -1,8 +1,8 @@
+import asyncio
 import logging
 from datetime import timedelta
 
 import aiohttp
-import asyncio
 from bs4 import BeautifulSoup
 
 from resources.config import settings
@@ -36,7 +36,6 @@ async def send_ifttt_notification(name, price, url, storage):
 async def fetch_all(url, storage):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
-            print(f"Request URL {url} : {resp.status}")
             data = await resp.text()
             soup = BeautifulSoup(data, features="lxml")
 
@@ -65,4 +64,3 @@ async def fetch(storage):
     prod_tracker_urls = prod_tracker.read().splitlines()
 
     await asyncio.gather(*(fetch_all(url, storage) for url in prod_tracker_urls))
-
