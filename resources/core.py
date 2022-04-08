@@ -23,23 +23,16 @@ async def send_ifttt_notification(name, price, url, storage):
 
 
 async def inspect_content(data, url, storage):
-    urls = []
-    products = []
-    prices = []
-
     soup = BeautifulSoup(data, features="lxml")
 
     name = soup.find("h1", attrs={"class": "fn"})
     price = soup.find("span", attrs={"class": "priceFinal fp44"})
-    logging.info(f"Scraping TopAchat {name.text}...")
+    logging.info(f"Scraping product : {name.text}...")
     availability = soup.find("section", attrs={"class": "cart-box en-rupture"})
 
     if availability is not None:
         logging.info(f"{name.text} en rupture de stock.")
     else:
-        products.append(name.text)
-        prices.append(price.text)
-        urls.append(url)
         await send_ifttt_notification(name.text, price.text, url, storage)
 
 
