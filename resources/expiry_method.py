@@ -13,10 +13,6 @@ class LocalStorage:
         self.update_keys(key_name)
         return key_name in self.storage
 
-    def get_key(self, key_name):
-        self.update_keys(key_name)
-        return self.storage.get(key_name)
-
     def set_key(self, key_name, date):
         self.storage[key_name] = datetime.now() + date
 
