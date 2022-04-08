@@ -16,7 +16,6 @@ HEADERS = {
 urls = []
 products = []
 prices = []
-stocks = []
 
 
 async def send_ifttt_notification(name, price, url, storage):
@@ -30,36 +29,34 @@ async def send_ifttt_notification(name, price, url, storage):
         report["value3"] = url
         async with aiohttp.ClientSession() as session:
             await session.post(settings.IFTTT_WEBHOOK_URL, data=report)
-        storage.set_key(url, timedelta(hours=3))
+        storage.set_key(url, timedelta(hours=settings.TIME_TO_EXPIRE))
+
+
+async def inspect_content(data, url, storage):
+    soup = BeautifulSoup(data, features="lxml")
+
+    name = soup.find("h1", attrs={"class": "fn"})
+    price = soup.find("span", attrs={"class": "priceFinal fp44"})
+    logging.info(f"Scraping TopAchat {name.text}...")
+    disponibility = soup.find("section", attrs={"class": "cart-box en-rupture"})
+
+    if disponibility is not None:
+        logging.info(f"{name.text} en rupture de stock.")
+    else:
+        products.append(name.text)
+        prices.append(price.text)
+        urls.append(url)
+        await send_ifttt_notification(name.text, price.text, url, storage)
 
 
 async def fetch_all(url, storage):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
             data = await resp.text()
-            soup = BeautifulSoup(data, features="lxml")
-
-            name = soup.find("h1", attrs={"class": "fn"})
-            price = soup.find("span", attrs={"class": "priceFinal fp44"})
-            logging.info(f"Scraping TopAchat {name.text}...")
-            disponibility = soup.find(
-                "section", attrs={"class": "cart-box en-rupture"}
-            )
-
-            if disponibility is not None:
-                logging.info(f"{name.text} en rupture de stock.")
-            else:
-                stock = "Disponible"
-                products.append(name.text)
-                prices.append(price.text)
-                stocks.append(stock)
-                urls.append(url)
-                await send_ifttt_notification(name.text, price.text, url, storage)
-
-    return soup
+            await inspect_content(data, url, storage)
 
 
-async def fetch(storage):
+async def get_url(storage):
     prod_tracker = open("trackers/products.csv")
     prod_tracker_urls = prod_tracker.read().splitlines()
 
