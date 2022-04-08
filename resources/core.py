@@ -7,12 +7,6 @@ from bs4 import BeautifulSoup
 
 from resources.config import settings
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) \
-        Chrome/41.0.2228.0 Safari/537.36",
-    "Accept-Language": "en-US, en;q=0.5",
-}
-
 urls = []
 products = []
 prices = []
@@ -38,9 +32,9 @@ async def inspect_content(data, url, storage):
     name = soup.find("h1", attrs={"class": "fn"})
     price = soup.find("span", attrs={"class": "priceFinal fp44"})
     logging.info(f"Scraping TopAchat {name.text}...")
-    disponibility = soup.find("section", attrs={"class": "cart-box en-rupture"})
+    availability = soup.find("section", attrs={"class": "cart-box en-rupture"})
 
-    if disponibility is not None:
+    if availability is not None:
         logging.info(f"{name.text} en rupture de stock.")
     else:
         products.append(name.text)

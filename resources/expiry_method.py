@@ -36,4 +36,4 @@ class RedisStorage:
         return self.r.exists(key_name)
 
     def set_key(self, key_name, time):
-        self.r.setex(key_name, time, value="Temps avant expiration")
+        self.r.setex(key_name, time, value="Time before expiration")
