@@ -7,10 +7,6 @@ from bs4 import BeautifulSoup
 
 from resources.config import settings
 
-urls = []
-products = []
-prices = []
-
 
 async def send_ifttt_notification(name, price, url, storage):
     report = {}
@@ -27,6 +23,10 @@ async def send_ifttt_notification(name, price, url, storage):
 
 
 async def inspect_content(data, url, storage):
+    urls = []
+    products = []
+    prices = []
+
     soup = BeautifulSoup(data, features="lxml")
 
     name = soup.find("h1", attrs={"class": "fn"})
