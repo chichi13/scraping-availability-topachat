@@ -3,4 +3,4 @@ pandas==1.4.4
 aiohttp==3.8.1
 redis==4.3.4
 lxml==4.9.1
-pydantic[dotenv]==1.10.1
+pydantic[dotenv]==1.10.2
