@@ -38,15 +38,15 @@ async def inspect_and_send(data, url, storage):
     await send_ifttt_notification(name.text, price.text, url, storage)
 
 
-async def fetch_all(url, storage):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as resp:
-            data = await resp.text()
-            await inspect_and_send(data, url, storage)
+async def fetch_all(url, storage, session):
+    async with session.get(url) as resp:
+        data = await resp.text()
+        await inspect_and_send(data, url, storage)
 
 
 async def get_url(storage):
     prod_tracker = open("trackers/products.csv")
     prod_tracker_urls = prod_tracker.read().splitlines()
 
-    await asyncio.gather(*(fetch_all(url, storage) for url in prod_tracker_urls))
+    async with aiohttp.ClientSession() as session:
+        await asyncio.gather(*(fetch_all(url, storage, session) for url in prod_tracker_urls))
