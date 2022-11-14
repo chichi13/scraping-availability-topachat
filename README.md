@@ -1,6 +1,8 @@
 # Scraping availability TopAchat
 
-This program is used to retrieve the availability status of one or more products on the TopAchat (FR) website.
+This program was used to retrieve the availability status of one or more products on the TopAchat (FR) website.
+
+**It's now a read only repo.**
 
 When the product is available --> Send an IFTTT notification to alert the user that the product is available.
 
